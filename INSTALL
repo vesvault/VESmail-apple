@@ -1,0 +1,23 @@
+Installation Instructions
+*************************
+
+Relies on VESmail -
+git@github.com:vesvault/VESmail.git
+
+Put the VESmail-apple dir in VESmail/app dir (VESmail/app/VESmail-apple),
+or adjust the paths in libvesmail/
+
+libcrypto.a and libssl.a have to be built for each target (OpenSSL).
+
+libcurl.a has to be built for each target (cURL).
+
+libVES.a has to be built for each target -
+git@github.com:vesvault/libVES.c.git
+
+Use libvesmail/make-* to build libvesmail.a for each target.
+
+Download snif-tunl for iOS VPN -
+git@github.com:vesvault/snif-tunl.git
+Use libsnifl/make-* to build libsnifl.a
+
+Use XCode to build the solution for each target - macOS and iOS-vpn

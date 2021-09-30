@@ -1,0 +1,55 @@
+module libvesmail_macos_arm64 [system] {
+  requires macos
+  header "../../../srv/local.h"
+  header "../../../srv/tls.h"
+  header "../../../srv/daemon.h"
+  link "vesmail-macos-arm64"
+  link "VES-macos-arm64"
+  link "crypto-macos-arm64"
+  link "ssl-macos-arm64"
+  link "curl-macos-arm64"
+  link "z"
+  export *
+}
+
+module libvesmail_ios_arm64 [system] {
+  requires ios
+  header "../../../srv/local.h"
+  header "../../../srv/tls.h"
+  header "../../../srv/daemon.h"
+  link "vesmail-ios-arm64"
+  link "VES-ios-arm64"
+  link "crypto-ios-arm64"
+  link "ssl-ios-arm64"
+  link "curl-ios-arm64"
+  link "z"
+  export *
+}
+
+module libvesmail_ioss_arm64 [system] {
+  requires ios
+  header "../../../srv/local.h"
+  header "../../../srv/tls.h"
+  header "../../../srv/daemon.h"
+  link "vesmail-ioss-arm64"
+  link "VES-ioss-arm64"
+  link "crypto-ioss-arm64"
+  link "ssl-ioss-arm64"
+  link "curl-ioss-arm64"
+  link "z"
+  export *
+}
+
+module libvesmail_macos_x86_64 [system] {
+  requires macos
+  header "../../../srv/local.h"
+  header "../../../srv/tls.h"
+  header "../../../srv/daemon.h"
+  link "vesmail-macos-x86_64"
+  link "VES-macos-x86_64"
+  link "crypto-macos-x86_64"
+  link "ssl-macos-x86_64"
+  link "curl-macos-x86_64"
+  link "z"
+  export *
+}

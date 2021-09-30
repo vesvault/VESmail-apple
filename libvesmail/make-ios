@@ -1,0 +1,19 @@
+#!/bin/bash
+
+make clean
+VM_CFLAGS="-DVESMAIL_DAEMON_AF=AF_INET \
+    -DVESMAIL_TLS_CLNMODE=SSL_MODE_RELEASE_BUFFERS \
+    -DVESMAIL_TLS_SRVMODE=SSL_MODE_RELEASE_BUFFERS \
+    -DVESMAIL_TLS_CLNOPTNS=SSL_OP_NO_COMPRESSION \
+    -DVESMAIL_TLS_SRVOPTNS=SSL_OP_NO_COMPRESSION \
+    -DVESMAIL_OPTNSMAXBUF=262144 \
+    -DVESMAIL_IMAP_TOKEN_SAFEBYTES=1048576 \
+    -DVESMAIL_APP_BUILD=ios \
+    -DSNIF_CAINFO=NULL \
+    -DVESMAIL_X509STORE_CAINFO=NULL"
+make CFLAGS="${VM_CFLAGS} -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk -fembed-bitcode -g"
+mv libvesmail.a libvesmail-ios-arm64.a
+cp /Users/test1/libVES.c/lib*-ios-arm64.a .
+cp /Users/test1/openssl/lib*-ios-arm64.a .
+cp /Users/test1/curl/lib*-ios-arm64.a .
+

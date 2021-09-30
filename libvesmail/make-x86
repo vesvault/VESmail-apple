@@ -1,0 +1,8 @@
+#!/bin/bash
+
+make clean
+make CFLAGS='-target x86_64-apple-macos -DVESMAIL_APP_BUILD=mac86'
+mv libvesmail.a libvesmail-macos-x86_64.a
+cp /Users/test1/libVES.c/lib*-macos-x86_64.a .
+cp /Users/test1/openssl/lib*-macos-x86_64.a .
+cp /Users/test1/curl/lib*-macos-x86_64.a .
