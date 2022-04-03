@@ -19,7 +19,7 @@ struct VESmail_appleApp: App {
     var proxy = vmProxy();
     var notify = vmNotify();
     var ctwin: Int = 0;
-    var lastBadge: Int = 0;
+    var lastBadge: Int = -1;
     var body: some Scene {
         WindowGroup {
             vmContentView()
@@ -36,7 +36,6 @@ struct VESmail_appleApp: App {
                         proxy.setwatch(false);
                     }
                 }
-//                .background(Color(red: 0.875, green: 0.875, blue: 0.875))
         }
     }
     init() {

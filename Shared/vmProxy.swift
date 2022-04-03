@@ -186,7 +186,7 @@ class vmProxy: ObservableObject {
             u.bullet = b;
             var uerrbuf: [CChar] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             let uerr = VESmail_local_getusererror(usr, &uerrbuf);
-            u.seterror(uerr != 0 ? String(cString: uerrbuf) : nil);
+            u.seterror(b == "e" && uerr != 0 ? String(cString: uerrbuf) : nil);
             uidx += 1;
         }
         if (uidx == 0) {

@@ -8,34 +8,41 @@
 import NetworkExtension
 import SwiftUI
 
+#if targetEnvironment(simulator)
+import libsnifl_ioss_arm64;
+#else
 import libsnifl_ios_arm64;
+#endif
 
 var vmApp: vmTunnelProvider!;
-
+  
 class vmTunnelProvider: NEPacketTunnelProvider {
     var proxy: vmProxy!;
     var notify: vmNotify!;
     var openUrlFn: ((_ url: String?) -> Bool)? = nil;
-    var lastBadge: Int = 0;
+    var lastBadge: Int = -1;
     var fwatched: Bool = false;
-    var pkts: [Any] = [];
     let tunlAddr = "169.254.86.77";
     let tunlPeer = "169.254.86.78";
     let tunlNet = "169.254.86.76";
     let tunlMask = "255.255.255.252";
     let tunlDst = "snif-tunl.vesmail.xyz";
-    var cerr: Any? = nil;
     let af = NSNumber(value: AF_INET);
-    
+    let mtu: Int32 = 1440;
+    var tstat: String = "";
+
     override init() {
         super.init();
         vmApp = self;
         proxy = vmProxy();
         notify = vmNotify();
+        tstat = "init";
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+        tstat = "starting";
         _ = proxy.snifhost { [self] host in
+            self.tstat = "conf";
             VESmail_tunl_init(proxy.snifsrv, tunlDst);
             let conf = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1");
             let v4 = NEIPv4Settings(addresses: [tunlAddr], subnetMasks: [tunlMask]);
@@ -48,8 +55,8 @@ class vmTunnelProvider: NEPacketTunnelProvider {
             dns.matchDomains = [host];
             conf.dnsSettings = dns;
             setTunnelNetworkSettings(conf) { error in
-                self.cerr = error;
-                VESmail_tunl_conf(1440) { pkt, len in
+                self.tstat = error == nil ? "ready" : error!.localizedDescription;
+                VESmail_tunl_conf(self.mtu) { pkt, len in
                     let data = Data(bytes: pkt!, count: Int(len));
                     DispatchQueue.main.async {
                         vmApp.packetFlow.writePackets([data], withProtocols: [vmApp.af]);
@@ -72,6 +79,7 @@ class vmTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        tstat = "stop";
         completionHandler()
     }
     
@@ -81,6 +89,7 @@ class vmTunnelProvider: NEPacketTunnelProvider {
             proxy.watch();
             var users: [[String : Any]] = [];
             var rsp: [String : Any] = [
+                "tstat": tstat,
                 "fbkbtn": proxy.fbkbtn,
                 "snifst": proxy.snifst,
                 "snifauth" : proxy.snifauth
@@ -154,17 +163,19 @@ class vmTunnelProvider: NEPacketTunnelProvider {
     func openurl(url: String) {
         if (openUrlFn?(url) ?? false) {
             openUrlFn = nil;
-            return;
         }
     }
+    
     func setbadge() {
         if let b = proxy?.errorct() {
             if (b != lastBadge) {
-                notify.setbadge(b);
+//                notify.setbadge(b);
+                notify.setbadge(0);
                 lastBadge = b;
             }
         }
     }
+    
     func vmBackgnd(_ bg: Bool) {
     }
 

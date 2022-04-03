@@ -4,3 +4,9 @@ module libsnifl_ios_arm64 [system] {
   link "snifl-ios-arm64"
   export *
 }
+module libsnifl_ioss_arm64 [system] {
+  requires ios
+  header "../../../snif/tunl.h"
+  link "snifl-ioss-arm64"
+  export *
+}

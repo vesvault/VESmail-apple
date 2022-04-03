@@ -24,6 +24,8 @@ class vmProxy: ObservableObject {
     let vpnId = "com.vesvault.vesmail.vmVPN";
     var conn: NETunnelProviderSession? = nil;
     var connecting: Bool = false;
+    var bypass: Bool = false;
+    var badct: Int = 0;
  
     func showstat(_ blink: Bool) -> Bool {
         var rs: Bool = false;
@@ -136,8 +138,9 @@ class vmProxy: ObservableObject {
     
     func initVPN() {
         connecting = true;
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
-            self.connecting = false;
+        bypass = false;
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            self.bypass = true;
         }
         NETunnelProviderManager.loadAllFromPreferences { mgrs, error in
             if (mgrs != nil) {
@@ -170,6 +173,7 @@ class vmProxy: ObservableObject {
     func query(_ req: [String: Any], callback: @escaping (_ rsp: [String: Any]) -> Void) -> Bool {
         switch conn?.status {
         case .connected:
+            connecting = false;
             break;
         case .none, .invalid, .disconnected:
             if (!connecting) {
@@ -180,7 +184,12 @@ class vmProxy: ObservableObject {
                     u.bullet1 = u.bullet0;
                 }
                 initVPN();
+                return false;
             }
+            if (bypass) {
+                break;
+            }
+            return false;
         default:
             return false;
         }
@@ -188,6 +197,7 @@ class vmProxy: ObservableObject {
             let enc = try JSONSerialization.data(withJSONObject: req, options: []);
             try conn?.sendProviderMessage(enc) {rsp in
                 if (rsp != nil) {
+                    self.badct = 0;
                     do {
                         let dec = try JSONSerialization.jsonObject(with: rsp!, options: []) as? [String : Any];
                         if (dec != nil) {
@@ -196,11 +206,18 @@ class vmProxy: ObservableObject {
                     } catch {
                         print("catch \(error)");
                     }
+                } else if (self.connecting) {
+                    self.badct += 1;
+                    if (self.badct > 40) {
+                        self.badct = 0;
+                        self.connecting = false;
+                    }
                 }
             }
             return true;
         } catch {
             NSLog("sendProviderMessage: catch \(error)");
+            connecting = false;
             return false;
         }
     }
